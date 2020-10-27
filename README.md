@@ -1,2 +1,2 @@
-# C33-Plinko-With-Scores
-Plinko Game with scores
+# p5.play-boilerplate
+Boiler plate for p5.play
