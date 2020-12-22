@@ -1,166 +1,160 @@
 const Engine = Matter.Engine;
 const World = Matter.World;
+const Events = Matter.Events;
 const Bodies = Matter.Bodies;
+ 
+var particles = [];
+var plinkos = [];
+var divisions = [];
 
-var engine, world;
-var ground;
-var division = [];
-var plinko1 = [], plinko2 = [], plinko3 = [], plinko4 = [];
 var particle;
+var turn = 0;
 
 var gameState = "play";
 
-var score = 0;
-var count = 0;
-
+var divisionHeight=300;
+var score =0;
 
 function setup() {
-  createCanvas(480,800);
-
+  createCanvas(800, 800);
   engine = Engine.create();
   world = engine.world;
+  ground = new Ground(width/2,height,width,20);
 
-  //creating divisions
-  for(var i=0; i<=480; i=i+80)
-  {
-    division.push (new Division(i, 610, 10, 380));
-  }
+  for (var k = 0; k <=width; k = k + 80) {
+     divisions.push(new Divisions(k, height-divisionHeight/2, 10, divisionHeight));
+   }
 
-  //plinko first line
-  for(var j =40; j<=width; j=j+50)
-  {
-    plinko1.push(new Plinko(j, 50));
-  }
+    for (var j = 75; j <=width; j=j+50) 
+    {
+    
+       plinkos.push(new Plinko(j,75));
+    }
 
-  //plinko second line
-  for(var j = 15; j<=width-10; j=j+50)
-  {
-    plinko2.push(new Plinko(j, 150));
-  }
+    for (var j = 50; j <=width-10; j=j+50) 
+    {
+       plinkos.push(new Plinko(j,175));
+    }
 
-  //plinko third line
-  for(var j =40; j<=width; j=j+50)
-  {
-    plinko3.push(new Plinko(j, 250));
-  }
+     for (var j = 75; j <=width; j=j+50) 
+    {
+    
+       plinkos.push(new Plinko(j,275));
+    }
 
-  //plinko fourth line
-  for(var j = 15; j<=width-10; j=j+50)
-  {
-    plinko4.push(new Plinko(j, 350));
-  }
-
-  //creating ground
-  ground = new Ground(240, 790, 480, 20);
+     for (var j = 50; j <=width-10; j=j+50) 
+    {
+       plinkos.push(new Plinko(j,375));
+    }    
 }
 
 function draw() {
-  background(0);  
+  background("black");
 
-  Engine.update(engine);
-  
-   //creating particles after every 60 frames
-    /* if(frameCount%60 === 0)
-   {
-     particle.push(new Particle(random(100, 380),random(0, 10)));
-   } */
-
-   //yellow line
+  push();
   stroke("yellow");
-  strokeWeight(8);
-  line(0, 395, 480, 395);
+  strokeWeight(10);
+  line(0, 450, 800, 450);
+  pop();
 
-  //displaying scores in each division
-  textSize(25);
-  noStroke();
-  fill("white")
-  text(500, 20, 500);
-  text(300, 100, 500);
-  text(100, 180, 500);
-  text(100, 260, 500);
-  text(300, 340, 500);
-  text(500, 420, 500);
+  textSize(20)
+  text("Score : "+score,20,30);
+  Engine.update(engine);
 
-  //displaying plinko1
-  for(var y=0; y<plinko1.length; y++)
-  {
-    plinko1[y].display();
+  
+   for (var i = 0; i < plinkos.length; i++) {
+     
+     plinkos[i].display();
+     
+   }
+  /* if(frameCount%60===0){
+     particles.push(particle);
+     score++;
+   } */
+  
+  for (var k = 0; k < divisions.length; k++) 
+  {     
+     divisions[k].display();
   }
 
-  //displaying plinko2
-  for(var y=0; y<plinko2.length; y++)
-  {
-    plinko2[y].display();
-  }
+  if(particle.y>450)
+    {
+     if(particle.x<400 && particles.x>560)
+     {
+       score = score+300;
+     }
+     else if(particle.x>400 && particle.x<560)
+     {
+       score = score+100;
+     }
+    }
 
-  //displaying plinko3
-  for(var y=0; y<plinko3.length; y++)
-  {
-    plinko3[y].display();
-  }
+    particles.push(particle);
 
-  //displaying plinko4
-  for(var y=0; y<plinko4.length; y++)
-  {
-    plinko4[y].display();
-  }
+    for (var j = 0; j < particles.length; j++) {
+   
+      particles[j].display();
+    }
 
-  //displaying ground
-  ground.display();
-
-   //displaying divisions
-   for(var x=0; x<division.length; x=x+1)
+   //printing scores
+   for(var i=20;i<=260;i+=80)
    {
-     division[x].display();
+     textSize(24);
+     stroke("yellow");
+     text("300", i,500)
+   }
+   
+   for(var i=340;i<=420;i+=80)
+   {
+     textSize(24);
+     stroke("yellow");
+     text("100", i,500)
    }
 
+   for(var i=500;i<=820;i+=80)
+   {
+     textSize(24);
+     stroke("yellow");
+     text("300", i,500)
+   }
 
-   particle = new Particle(mouseX, 10);
+  
 
-   particle.display();
 
-// Also why is my ball not falling down? i meant particle.
-
- /*   if(particle != null) 
-    { 
-      particle.display();
-     //to calculate score
-      if(particle.body.position.y>395)
-      {
-        if(particle.body.position.x<80  &&  particle.body.position.x>400)
-        {
-          score = score+500;
-          particle = null;
-        }
-        else if(particle.body.position.x>80  && particle.body.position.x<160 && particle.body.position.x>320 && particle.body.position.x<400)
-        {
-          score = score+300;
-          particle = null;
-        }
-        else if(particle.body.position.x>160  &&  particle.body.position.x<320)
-        {
-          score = score+100;
-          particle = null;
-        }
-      }
-    if(count === 5)
+   if(turn===5)
     {
-      gameState === "end";
+      gameState = "end";
     }
-  }*/
 
-
- // drawSprites();
+    if(gameState === "end")
+    {
+      textSize(50)
+      stroke("Lime");
+      text("Game Over",200, 200);
+    }
+    if(turn <= 5){
+    if(particle.body.position.y>450)
+  {
+   if(particle.x<400 && particles.x>560)
+   {
+     score = score+300;
+   }
+   else if(particle.x>400 && particle.x<560) //this is the particloe whic is gettiong spawned in mousePressed function and i pushed it in array.
+   //only score is not calculating
+   
+   {
+     score = score+100;
+   }
+  }
+}
 
 }
 
 function mousePressed()
 {
-  console.log("Mouse event")
-  if(gameState !=="end")
+  if(gameState !== "end")
   {
-    console.log("success 162");
-    count++;
-    //particle = new Particle(mouseX,10);
+    turn++;
+    particle = new Particle(random(width/2-30, width/2+30), 10,10);
   }
 }
